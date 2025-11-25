@@ -77,8 +77,6 @@ Each strip represents one traffic lamp. Only one strip should ever be illuminate
 
 ### Checklist
 
-### Checklist
-
 #### ✅ Power
 
 * LED strip **+5V** must connect to the external 5 V PSU (not only the Nano 5V pin).
@@ -96,8 +94,6 @@ Make sure:
 
 * Each strip has its own resistor on the data line.
 * You are connected to **DIN**, not **DOUT** (output end).
-* Nano **D4 → 330 Ω resistor → DIN** of the first LED strip
-* Ensure you are connected to **DIN**, not **DOUT** (output end).
 
 ---
 
