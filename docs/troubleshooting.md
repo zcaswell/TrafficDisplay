@@ -67,6 +67,16 @@ Use the same pins defined in this project. If this test fails, fix wiring/power 
 
 ## 2. LEDs do not light or show random colors
 
+⚠️ This project now uses **three separate WS2812B LED strips**, each on its own data pin:
+
+* **Red strip → Arduino D4**
+* **Yellow strip → Arduino D5**
+* **Green strip → Arduino D6**
+
+Each strip represents one traffic lamp. Only one strip should ever be illuminated at a time.
+
+### Checklist
+
 ### Checklist
 
 #### ✅ Power
@@ -76,8 +86,16 @@ Use the same pins defined in this project. If this test fails, fix wiring/power 
 
 ---
 
-#### ✅ Data Line
+#### ✅ Data Lines (3-strip configuration)
 
+* Red strip: Nano **D4 → 330 Ω resistor → DIN**
+* Yellow strip: Nano **D5 → 330 Ω resistor → DIN**
+* Green strip: Nano **D6 → 330 Ω resistor → DIN**
+
+Make sure:
+
+* Each strip has its own resistor on the data line.
+* You are connected to **DIN**, not **DOUT** (output end).
 * Nano **D4 → 330 Ω resistor → DIN** of the first LED strip
 * Ensure you are connected to **DIN**, not **DOUT** (output end).
 
