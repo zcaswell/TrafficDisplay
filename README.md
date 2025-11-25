@@ -73,7 +73,7 @@ Full details in: `hardware/BOM.md`
 | TFT MISO              | D12      |
 | TFT SCK               | D13      |
 
-Full wiring details: `docs/wiring-notes.md`
+Full wiring details: `hardware/wiring-notes.md`
 
 ---
 
@@ -95,19 +95,19 @@ Uses Adafruit libraries:
 ## 📁 Repository Structure
 
 ```
-/traffic-signal-project
+/TrafficDisplay
 │
-├── traffic_ped_signal.ino
 ├── README.md
+├── src/
+│   └── traffic_ped_signal.ino
 ├── hardware/
-│   └── BOM.md
+│   ├── BOM.md
+│   └── wiring-notes.md
 ├── docs/
-│   ├── wiring-notes.md
 │   ├── timing-diagram.md
 │   ├── troubleshooting.md
-│   └── references.md
-└── images/
-    └── wiring-diagram.png
+│   ├── links-and-resources.md
+│   └── walking_man_sprite.png
 ```
 
 ---
@@ -121,9 +121,9 @@ Uses Adafruit libraries:
    * Adafruit GFX Library
    * Adafruit ILI9341
 
-2. Wire components according to `docs/wiring-notes.md`
+2. Wire components according to `hardware/wiring-notes.md`
 
-3. Upload `traffic_ped_signal.ino` to Arduino Nano
+3. Upload `src/traffic_ped_signal.ino` to Arduino Nano
 
 4. Power system with 5V PSU
 
@@ -140,7 +140,8 @@ Use a dedicated 5V 3–5A supply and connect all grounds together.
 
 ## 📸 Visuals
 
-See `/images/wiring-diagram.png` for complete connection overview.
+See `docs/walking_man_sprite.png` for the walking man sprite reference.
+For wiring connections, refer to `hardware/wiring-notes.md` for detailed pin mappings.
 
 ---
 
