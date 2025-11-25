@@ -6,9 +6,12 @@
 
 // ---------------------- CONFIG ----------------------
 
-// LED strips (3x WS2812B strips all tied to same data pin)
-#define NUM_LEDS      15     // LEDs per strip (or total if chained)
-#define LED_PIN       4      // Data pin for WS2812B
+// LED strips: one per traffic lamp (red, yellow, green)
+#define NUM_LEDS      15     // LEDs per strip
+
+#define RED_PIN       4
+#define YELLOW_PIN    5
+#define GREEN_PIN     6
 
 // Button
 #define BTN_PIN       2      // Momentary button to GND (INPUT_PULLUP)
@@ -18,7 +21,10 @@
 #define TFT_DC        9
 #define TFT_RST       8
 
-CRGB leds[NUM_LEDS];
+// LED arrays: one per color
+CRGB redLeds[NUM_LEDS];
+CRGB yellowLeds[NUM_LEDS];
+CRGB greenLeds[NUM_LEDS];
 
 // Button handler: active-low, with internal pull-up
 OneButton btn(BTN_PIN, true, true);
@@ -54,19 +60,36 @@ unsigned long lastCountdownTick = 0;
 bool walkFrame = false;
 unsigned long lastWalkAnimMillis = 0;
 
-// ---------------------- HELPERS ----------------------
+// ---------------------- LED HELPERS ----------------------
 
-void setAllStripsColor(const CRGB &color) {
-  fill_solid(leds, NUM_LEDS, color);
+void clearAllLamps() {
+  fill_solid(redLeds,    NUM_LEDS, CRGB::Black);
+  fill_solid(yellowLeds, NUM_LEDS, CRGB::Black);
+  fill_solid(greenLeds,  NUM_LEDS, CRGB::Black);
 }
 
-// Clear entire TFT
+void showRedLamp() {
+  clearAllLamps();
+  fill_solid(redLeds, NUM_LEDS, CRGB::Red);
+}
+
+void showYellowLamp() {
+  clearAllLamps();
+  fill_solid(yellowLeds, NUM_LEDS, CRGB::Yellow);
+}
+
+void showGreenLamp() {
+  clearAllLamps();
+  fill_solid(greenLeds, NUM_LEDS, CRGB::Green);
+}
+
+// ---------------------- TFT HELPERS ----------------------
+
 void clearScreen(uint16_t color = ILI9341_BLACK) {
   tft.fillScreen(color);
 }
 
-// Draw a simple walking man at (x, y) on the TFT.
-// frame toggles the leg positions.
+// Draw a simple walking man at (x, y).
 void drawWalkingMan(int16_t x, int16_t y, bool frame) {
   // Erase area around sprite to avoid smearing
   tft.fillRect(x - 30, y - 60, 60, 100, ILI9341_BLACK);
@@ -107,7 +130,7 @@ void showWalkScreen() {
 
   // Center walking man roughly in the middle
   walkFrame = false;
-  drawWalkingMan(120, 180, walkFrame);
+  drawWalkingMan(120, 160, walkFrame);
   lastWalkAnimMillis = millis();
 }
 
@@ -142,7 +165,8 @@ void updateWalkAnimation(unsigned long now) {
   }
 }
 
-// Forward declaration
+// ---------------------- STATE HELPERS ----------------------
+
 void gotoState(SystemState newState);
 
 void stopSequence() {
@@ -172,7 +196,7 @@ void gotoState(SystemState newState) {
 
   switch (state) {
     case IDLE:
-      setAllStripsColor(CRGB::Black);
+      clearAllLamps();
       clearScreen(ILI9341_BLACK);
       tft.setTextColor(ILI9341_CYAN);
       tft.setTextSize(2);
@@ -183,7 +207,7 @@ void gotoState(SystemState newState) {
     case FLASH_RED:
       flashOn = false;
       lastFlashMillis = 0;
-      setAllStripsColor(CRGB::Black);
+      clearAllLamps();
       clearScreen(ILI9341_BLACK);
       tft.setTextColor(ILI9341_RED);
       tft.setTextSize(2);
@@ -192,7 +216,7 @@ void gotoState(SystemState newState) {
       break;
 
     case SOLID_RED:
-      setAllStripsColor(CRGB::Red);
+      showRedLamp();
       clearScreen(ILI9341_BLACK);
       tft.setTextColor(ILI9341_RED);
       tft.setTextSize(4);
@@ -201,7 +225,7 @@ void gotoState(SystemState newState) {
       break;
 
     case RED_CLEAR:
-      setAllStripsColor(CRGB::Red);
+      showRedLamp();
       clearScreen(ILI9341_BLACK);
       tft.setTextColor(ILI9341_RED);
       tft.setTextSize(2);
@@ -210,7 +234,7 @@ void gotoState(SystemState newState) {
       break;
 
     case GREEN_STATE:
-      setAllStripsColor(CRGB::Green);
+      showGreenLamp();
       clearScreen(ILI9341_BLACK);
       tft.setTextColor(ILI9341_GREEN);
       tft.setTextSize(3);
@@ -219,7 +243,7 @@ void gotoState(SystemState newState) {
       break;
 
     case YELLOW_STATE:
-      setAllStripsColor(CRGB::Yellow);
+      showYellowLamp();
       clearScreen(ILI9341_BLACK);
       tft.setTextColor(ILI9341_YELLOW);
       tft.setTextSize(3);
@@ -229,13 +253,13 @@ void gotoState(SystemState newState) {
 
     case WALK_SOLID:
       // Vehicles red, walking man animation
-      setAllStripsColor(CRGB::Red);
+      showRedLamp();
       showWalkScreen();
       break;
 
     case WALK_COUNTDOWN:
       // Vehicles still red, walking man + countdown
-      setAllStripsColor(CRGB::Red);
+      showRedLamp();
       countdownSeconds = random(10, 31);  // 10-30 inclusive
       showWalkCountdownScreen(countdownSeconds);
       lastCountdownTick = millis();
@@ -246,10 +270,12 @@ void gotoState(SystemState newState) {
 // ---------------------- SETUP / LOOP ----------------------
 
 void setup() {
-  // WS2812B LED strips
-  FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
+  // WS2812B LED strips: one per lamp
+  FastLED.addLeds<WS2812B, RED_PIN,    GRB>(redLeds,    NUM_LEDS);
+  FastLED.addLeds<WS2812B, YELLOW_PIN, GRB>(yellowLeds, NUM_LEDS);
+  FastLED.addLeds<WS2812B, GREEN_PIN,  GRB>(greenLeds,  NUM_LEDS);
   FastLED.setBrightness(80);
-  FastLED.clear();
+  clearAllLamps();
   FastLED.show();
 
   // Button
@@ -282,7 +308,11 @@ void loop() {
       if (now - lastFlashMillis >= 500) {
         lastFlashMillis = now;
         flashOn = !flashOn;
-        setAllStripsColor(flashOn ? CRGB::Red : CRGB::Black);
+        if (flashOn) {
+          showRedLamp();
+        } else {
+          clearAllLamps();
+        }
       }
       if (now - stateStartMillis >= 6000) {
         gotoState(SOLID_RED);
