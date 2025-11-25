@@ -1,115 +1,171 @@
-# Traffic + Pedestrian Signal Demo (Arduino Nano, WS2812B, ILI9341 TFT)
+# 🚦 Arduino Traffic & Pedestrian Signal System
 
-This project implements a **traffic and pedestrian signal** on an Arduino Nano, with:
+A fully-functional traffic and pedestrian crossing signal system built using an **Arduino Nano V3.0**, an **ILI9341 3.2" TFT display**, and **three independent WS2812B LED strips** representing real-world Red, Yellow, and Green traffic lamps.
 
-- 3× WS2812B RGB LED strips for red / yellow / green traffic signals
-- A **3.2" ILI9341 TFT** display showing a *walking man animation* and countdown
-- A single **momentary push button** to start/stop the sequence
-
-It’s designed as a teaching / demo tool for state machines, timing, and simple graphics on small microcontrollers.
+This project simulates a realistic road signal with pedestrian interaction, animated walking man, and randomized countdown timing.
 
 ---
 
-## Features
+## ✨ Features
 
-- One-button control:
-  - Press from idle → run full traffic + pedestrian cycle
-  - Press while running → abort and return to idle
-- Traffic sequence:
-  1. 6 s **flashing red**
-  2. 6 s **solid red**
-  3. Three cycles of:
-     - 10 s **red clearance**
-     - 25 s **green**
-     - 3 s **yellow clearance**
-- Pedestrian sequence:
-  - 7 s **"WALK"** phase with walking man animation
-  - Random **countdown 10–30 s** with walking man + big numeric countdown
-- Non-blocking timing using `millis()`, so the button remains responsive
-- Uses common, well-supported Arduino libraries
+* ✅ Realistic traffic light sequence
+* ✅ Pedestrian request via pushbutton
+* ✅ Animated walking man on TFT screen
+* ✅ Randomized pedestrian countdown (10–30s)
+* ✅ Three independent LED strips (true signal behavior)
+* ✅ Start / Stop control with single button
+* ✅ Designed for Arduino Nano (ATmega328P, 5V)
 
 ---
 
-## Hardware
+## 🕹️ How It Works
 
-See **[`hardware/BOM.md`](hardware/BOM.md)** for the full bill of materials and **[`hardware/wiring-notes.md`](hardware/wiring-notes.md)** for wiring details.
+1. Press button to start cycle
+2. System flashes red, then solid red
+3. Runs 3 full vehicle cycles:
 
-High-level parts list:
+   * Red → Green → Yellow
+4. Pedestrian phase activates:
 
-- Arduino Nano V3.0 (ATmega328P, 5 V / 16 MHz)
-- 3× WS2812B addressable LED strips
-- 3.2" ILI9341 TFT LCD Breakout (SPI, 5 V logic–compatible)
-- Momentary push button (NO)
-- 5 V / 3–5 A power supply
-- Various passives (330 Ω resistor, 1000 µF capacitor) and jumper wires
-
----
-
-## Software Setup
-
-### Libraries
-
-Install these libraries via **Sketch → Include Library → Manage Libraries…** in the Arduino IDE:
-
-- **FastLED**
-- **OneButton**
-- **Adafruit GFX Library**
-- **Adafruit ILI9341**
-
-Then open `src/traffic_ped_signal.ino`.
-
-### Board & Port
-
-1. In the Arduino IDE, select:
-   - Board: `Arduino Nano`
-   - Processor: `ATmega328P (Old Bootloader)` or the correct setting for your Nano
-2. Select the correct serial port.
-
-### Upload
-
-1. Connect the Nano via USB.
-2. Click **Upload**.
-3. Open the Serial Monitor if you add debug prints (none by default).
+   * Walking man animation
+   * Random countdown
+5. System stops and returns to IDLE
+6. Button press can halt sequence at any time
 
 ---
 
-## Operation
+## 🔄 Sequence Overview
 
-1. Power the system with the 5 V PSU (and/or via USB for programming).
-2. The system starts in **IDLE**:
-   - LED strips off
-   - TFT shows "Press button to start"
-3. Press the button:
-   - The sequence starts (FLASH_RED → SOLID_RED → cycles → pedestrian WALK + countdown).
-4. Press the button **again at any time**:
-   - The sequence stops immediately and returns to IDLE.
-5. Press the button again from IDLE to restart the full sequence.
+```
+IDLE → FLASH_RED → SOLID_RED →
+(RED_CLEAR → GREEN → YELLOW) × 3 →
+WALK_SOLID → WALK_COUNTDOWN → IDLE
+```
 
 ---
 
-## Walking Man Animation
+## 🧩 Hardware Used
 
-The walking man is a simple stick figure with two frames:
+* Arduino Nano V3.0 (ATmega328P)
+* 3.2" TFT LCD ILI9341 Display (SPI, 240x320)
+* 3 × WS2812B RGB LED Strips (Red / Yellow / Green)
+* Momentary Push Button
+* 5V 3–5A Power Supply
+* 3 × 330Ω resistors
+* 1 × 1000µF capacitor
 
-- Frame A: left leg forward, right leg back
-- Frame B: right leg forward, left leg back
-
-You can see an example sprite in **[`docs/walking-man-sprite.png`](docs/walking-man-sprite.png)** and tweak the on-screen drawing in `drawWalkingMan()` inside the sketch.
-
----
-
-## Customization Ideas
-
-- Map each LED strip to a specific signal:
-  - Top strip: red
-  - Middle strip: yellow
-  - Bottom strip: green
-- Use the TFT’s touchscreen to start/stop instead of the button.
-- Add more animation frames for smoother walking.
-- Use the MicroSD socket on the TFT breakout to store bitmaps for more detailed graphics.
+Full details in: `hardware/BOM.md`
 
 ---
 
-## License
+## 🔌 Pin Mapping (Summary)
 
-This project is released under the **MIT License**. See [`LICENSE`](LICENSE) for details.
+| Component             | Nano Pin |
+| --------------------- | -------- |
+| Red LED Strip Data    | D4       |
+| Yellow LED Strip Data | D5       |
+| Green LED Strip Data  | D6       |
+| Button                | D2       |
+| TFT CS                | D10      |
+| TFT DC                | D9       |
+| TFT RST               | D8       |
+| TFT MOSI              | D11      |
+| TFT MISO              | D12      |
+| TFT SCK               | D13      |
+
+Full wiring details: `docs/wiring-notes.md`
+
+---
+
+## 📟 Display
+
+The TFT shows:
+
+* Traffic state text
+* Animated walking man
+* Large pedestrian countdown timer
+
+Uses Adafruit libraries:
+
+* Adafruit_GFX
+* Adafruit_ILI9341
+
+---
+
+## 📁 Repository Structure
+
+```
+/traffic-signal-project
+│
+├── traffic_ped_signal.ino
+├── README.md
+├── hardware/
+│   └── BOM.md
+├── docs/
+│   ├── wiring-notes.md
+│   ├── timing-diagram.md
+│   ├── troubleshooting.md
+│   └── references.md
+└── images/
+    └── wiring-diagram.png
+```
+
+---
+
+## 🚀 Getting Started
+
+1. Install required libraries via Arduino IDE Library Manager:
+
+   * FastLED
+   * OneButton
+   * Adafruit GFX Library
+   * Adafruit ILI9341
+
+2. Wire components according to `docs/wiring-notes.md`
+
+3. Upload `traffic_ped_signal.ino` to Arduino Nano
+
+4. Power system with 5V PSU
+
+5. Press button to begin
+
+---
+
+## ⚠️ Power Warning
+
+Do NOT power LED strips directly from Nano 5V pin.
+Use a dedicated 5V 3–5A supply and connect all grounds together.
+
+---
+
+## 📸 Visuals
+
+See `/images/wiring-diagram.png` for complete connection overview.
+
+---
+
+## 📜 License
+
+MIT License – feel free to use, modify, and distribute.
+
+---
+
+## 👤 Contributing
+
+Pull requests and improvements are welcome!
+Consider adding:
+
+* More signal modes
+* Audible pedestrian signal
+* Multiple intersections
+
+---
+
+## ✅ Status
+
+✔ Fully functional and tested logic design
+✔ Consistent documentation
+✔ Nano-compatible
+✔ Ready for expansion
+
+Enjoy building your smart traffic system 🚦
